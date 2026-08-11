@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.652698795180723,
+        "y": 2.1554337349397588
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.051944444444445,
+        "y": 2.0666222222222213
+      },
+      "isLocked": false,
+      "linkedName": "RBumpEnd"
+    },
+    {
+      "anchor": {
+        "x": 7.665844444444444,
+        "y": 2.095855555555554
+      },
+      "prevControl": {
+        "x": 7.412488888888889,
+        "y": 1.5014444444444437
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "RSweapStart"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.5,
+    "rotation": 60.42216131873858
+  },
+  "reversed": false,
+  "folder": "Right",
+  "idealStartingState": {
+    "velocity": 1.5,
+    "rotation": -14.562864325402384
+  },
+  "useDefaultConstraints": true
+}

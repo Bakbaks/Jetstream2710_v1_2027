@@ -1,0 +1,104 @@
+package frc.robot.commands.shoot;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Hopper;
+import java.util.function.Supplier;
+
+/** Shoots notes with flywheel speed interpolated from PhotonVision distance to tag 10. */
+public class NeutralVolley extends Command {
+  private final Flywheel m_flywheel;
+  private final Hopper m_hopper;
+  // private final IntakeRollers m_intakeRollers;
+  private final Supplier<Pose2d> robotPoseSupplier;
+
+  private double rpm;
+
+  /**
+   * Creates a PopNAwe command.
+   *
+   * @param rollers Shooter subsystem
+   * @param vision Vision for PhotonVision distance to tag 10
+   */
+  public NeutralVolley(
+      Flywheel flywheel, Hopper hopper, Supplier<Pose2d> robotPoseSupplier, double RPM) {
+    m_flywheel = flywheel;
+    m_hopper = hopper;
+    // m_intakeRollers = intakeRollers;
+    this.robotPoseSupplier = robotPoseSupplier;
+    this.rpm = RPM;
+    addRequirements(m_flywheel, m_hopper);
+  }
+
+  // private int getAllianceTagId() {
+  // return DriverStation.getAlliance()
+  //     .map(alliance ->
+  //         alliance == DriverStation.Alliance.Red
+  //             ? FieldConstants.RED_SHOOT_TAG
+  //             : FieldConstants.BLUE_SHOOT_TAG)
+  //     .orElse(FieldConstants.RED_SHOOT_TAG);
+  // }
+
+  @Override
+  public void initialize() {}
+
+  @Override
+  public void execute() {
+    // Robot Pose to Goal distance
+    // Pose2d robotPose = robotPoseSupplier.get();
+    // int tagId = getAllianceTagId();
+
+    // Optional<Pose2d> maybeTargetPose =
+    //     RobotLocalization.fieldPoseFromTagTransform(tagId, FieldConstants.RightTagToHub);
+    // if (maybeTargetPose.isEmpty()) {
+    //   m_flywheel.stop();
+    //   m_hopper.stop();
+    //   return;
+    // }
+    // Pose2d targetPose = maybeTargetPose.get();
+
+    // double targetDistance = RobotLocalization.robotToTargetDistanceMeters(robotPose, targetPose);
+
+    // SmartDashboard.putNumber("Robot distance to Hub", targetDistance);
+
+    // Distance to RPM map
+    // double rpm = FlywheelInterpolation.getRPMForDistance(Optional.of(targetDistance));
+
+    // Control
+
+    m_flywheel.setRPM(rpm); // for testing
+    // if (!ConstSpeed){m_flywheel.setRPM(rpm);}; // for interpolation
+
+    // if (m_flywheel.isVelocityWithinTolerance()) {
+    if (m_flywheel.isVelocityWithinTolerance()) {
+      // m_hopper.setFloorRPM(5000);
+      // m_hopper.setFeederRPM(5800);
+      // m_hopper.setPercentOutputs(1,1);
+    }
+
+    // m_hopper.setFloorRPM(2000);
+    // m_hopper.setFeederRPM(2000);
+
+    // m_intakeRollers.setIntakeSpeed(Speed.INTAKE);
+
+    // m_hopper.setPercentOutputs(HopperConstants.kFloorPercent, HopperConstants.kFeederPercent);
+
+    // } else {
+    //   m_hopper.stop();
+    // }
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    m_flywheel.stop();
+    m_hopper.stop();
+    // m_intakeRollers.setIntakeSpeed(Speed.STOP);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}

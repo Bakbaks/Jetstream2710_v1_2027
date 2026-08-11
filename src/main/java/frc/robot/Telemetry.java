@@ -1,0 +1,338 @@
+package frc.robot;
+
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Intake.IntakeExtendo;
+import frc.robot.subsystems.Intake.IntakeRollers;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.FlywheelInterpolation;
+import frc.robot.util.RobotLocalization;
+import frc.robot.util.ShootOnMoveUtil;
+import frc.robot.util.ShootOnMoveUtil.ShotSolution;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+public class Telemetry {
+  private final double MaxSpeed;
+  private final Vision vision;
+  private final Flywheel flywheel;
+  private final Hopper hopper;
+  private final IntakeRollers intakeRollers;
+  private final IntakeExtendo intakeExtendo;
+  private final Supplier<ChassisSpeeds> fieldRelativeSpeedsSupplier;
+
+  /** Holder for latest state so SwerveDrive Sendable can read it. */
+  private volatile SwerveDriveState m_lastState = null;
+
+  public Telemetry(
+      double maxSpeed,
+      Vision vision,
+      Flywheel flywheel,
+      Hopper hopper,
+      IntakeRollers intakeRollers,
+      IntakeExtendo intakeExtendo,
+      Supplier<ChassisSpeeds> fieldRelativeSpeedsSupplier) {
+    MaxSpeed = maxSpeed;
+    this.vision = vision;
+    this.flywheel = flywheel;
+    this.hopper = hopper;
+    this.intakeRollers = intakeRollers;
+    this.intakeExtendo = intakeExtendo;
+    this.fieldRelativeSpeedsSupplier = fieldRelativeSpeedsSupplier;
+    SignalLogger.start();
+    SmartDashboard.putData("Swerve Drive", createSwerveDriveSendable());
+    SmartDashboard.putData("Field", field2d);
+
+    // Initialize network table entries with current values
+    flywheelFFKS = flywheelTable.getDoubleTopic("FF KS").subscribe(flywheel.getFeedforwardKS());
+    flywheelFFKV = flywheelTable.getDoubleTopic("FF KV").subscribe(flywheel.getFeedforwardKV());
+    flywheelFFKA = flywheelTable.getDoubleTopic("FF KA").subscribe(flywheel.getFeedforwardKA());
+
+    // Also publish them to ensure they appear
+    flywheelTable.getDoubleTopic("FF KS").publish().set(flywheel.getFeedforwardKS());
+    flywheelTable.getDoubleTopic("FF KV").publish().set(flywheel.getFeedforwardKV());
+    flywheelTable.getDoubleTopic("FF KA").publish().set(flywheel.getFeedforwardKA());
+  }
+
+  private Sendable createSwerveDriveSendable() {
+    return new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
+        builder.addDoubleProperty(
+            "Front Left Angle",
+            () -> m_lastState != null ? m_lastState.ModuleStates[0].angle.getRadians() : 0,
+            null);
+        builder.addDoubleProperty(
+            "Front Left Velocity",
+            () -> m_lastState != null ? m_lastState.ModuleStates[0].speedMetersPerSecond : 0,
+            null);
+        builder.addDoubleProperty(
+            "Front Right Angle",
+            () -> m_lastState != null ? m_lastState.ModuleStates[1].angle.getRadians() : 0,
+            null);
+        builder.addDoubleProperty(
+            "Front Right Velocity",
+            () -> m_lastState != null ? m_lastState.ModuleStates[1].speedMetersPerSecond : 0,
+            null);
+        builder.addDoubleProperty(
+            "Back Left Angle",
+            () -> m_lastState != null ? m_lastState.ModuleStates[2].angle.getRadians() : 0,
+            null);
+        builder.addDoubleProperty(
+            "Back Left Velocity",
+            () -> m_lastState != null ? m_lastState.ModuleStates[2].speedMetersPerSecond : 0,
+            null);
+        builder.addDoubleProperty(
+            "Back Right Angle",
+            () -> m_lastState != null ? m_lastState.ModuleStates[3].angle.getRadians() : 0,
+            null);
+        builder.addDoubleProperty(
+            "Back Right Velocity",
+            () -> m_lastState != null ? m_lastState.ModuleStates[3].speedMetersPerSecond : 0,
+            null);
+        builder.addDoubleProperty(
+            "Robot Angle",
+            () -> m_lastState != null ? m_lastState.Pose.getRotation().getRadians() : 0,
+            null);
+      }
+    };
+  }
+
+  private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+  private final NetworkTable driveStateTable = inst.getTable("DriveState");
+  private final StructPublisher<Pose2d> drivePose =
+      driveStateTable.getStructTopic("Pose", Pose2d.struct).publish();
+  private final StructPublisher<ChassisSpeeds> driveSpeeds =
+      driveStateTable.getStructTopic("Speeds", ChassisSpeeds.struct).publish();
+  private final StructArrayPublisher<SwerveModuleState> driveModuleStates =
+      driveStateTable.getStructArrayTopic("ModuleStates", SwerveModuleState.struct).publish();
+  private final StructArrayPublisher<SwerveModuleState> driveModuleTargets =
+      driveStateTable.getStructArrayTopic("ModuleTargets", SwerveModuleState.struct).publish();
+  private final StructArrayPublisher<SwerveModulePosition> driveModulePositions =
+      driveStateTable.getStructArrayTopic("ModulePositions", SwerveModulePosition.struct).publish();
+  private final DoublePublisher driveTimestamp =
+      driveStateTable.getDoubleTopic("Timestamp").publish();
+  private final DoublePublisher driveOdometryFrequency =
+      driveStateTable.getDoubleTopic("OdometryFrequency").publish();
+
+  private final NetworkTable flywheelTable = inst.getTable("Flywheel");
+  private final DoubleSubscriber flywheelFFKS;
+  private final DoubleSubscriber flywheelFFKV;
+  private final DoubleSubscriber flywheelFFKA;
+
+  /* Field2d for Elastic dashboard field widget */
+  private final Field2d field2d = new Field2d();
+  /* Mechanisms to represent the swerve module states */
+  private final Mechanism2d[] m_moduleMechanisms =
+      new Mechanism2d[] {
+        new Mechanism2d(1, 1), new Mechanism2d(1, 1), new Mechanism2d(1, 1), new Mechanism2d(1, 1),
+      };
+  /* A direction and length changing ligament for speed representation */
+  private final MechanismLigament2d[] m_moduleSpeeds =
+      new MechanismLigament2d[] {
+        m_moduleMechanisms[0]
+            .getRoot("RootSpeed", 0.5, 0.5)
+            .append(new MechanismLigament2d("Speed", 0.5, 0)),
+        m_moduleMechanisms[1]
+            .getRoot("RootSpeed", 0.5, 0.5)
+            .append(new MechanismLigament2d("Speed", 0.5, 0)),
+        m_moduleMechanisms[2]
+            .getRoot("RootSpeed", 0.5, 0.5)
+            .append(new MechanismLigament2d("Speed", 0.5, 0)),
+        m_moduleMechanisms[3]
+            .getRoot("RootSpeed", 0.5, 0.5)
+            .append(new MechanismLigament2d("Speed", 0.5, 0)),
+      };
+  /* A direction changing and length constant ligament for module direction */
+  private final MechanismLigament2d[] m_moduleDirections =
+      new MechanismLigament2d[] {
+        m_moduleMechanisms[0]
+            .getRoot("RootDirection", 0.5, 0.5)
+            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+        m_moduleMechanisms[1]
+            .getRoot("RootDirection", 0.5, 0.5)
+            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+        m_moduleMechanisms[2]
+            .getRoot("RootDirection", 0.5, 0.5)
+            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+        m_moduleMechanisms[3]
+            .getRoot("RootDirection", 0.5, 0.5)
+            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+      };
+
+  private final double[] m_poseArray = new double[3];
+  private final double[] m_moduleStatesArray = new double[8];
+  private final double[] m_moduleTargetsArray = new double[8];
+
+  /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
+  public void telemeterize(SwerveDriveState state) {
+    m_lastState = state;
+
+    /* Telemeterize the swerve drive state */
+    drivePose.set(state.Pose);
+    driveSpeeds.set(state.Speeds);
+    driveModuleStates.set(state.ModuleStates);
+    driveModuleTargets.set(state.ModuleTargets);
+    driveModulePositions.set(state.ModulePositions);
+    driveTimestamp.set(state.Timestamp);
+    driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
+
+    /* Also write to log file */
+    m_poseArray[0] = state.Pose.getX();
+    m_poseArray[1] = state.Pose.getY();
+    m_poseArray[2] = state.Pose.getRotation().getDegrees();
+    for (int i = 0; i < 4; ++i) {
+      m_moduleStatesArray[i * 2 + 0] = state.ModuleStates[i].angle.getRadians();
+      m_moduleStatesArray[i * 2 + 1] = state.ModuleStates[i].speedMetersPerSecond;
+      m_moduleTargetsArray[i * 2 + 0] = state.ModuleTargets[i].angle.getRadians();
+      m_moduleTargetsArray[i * 2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
+    }
+
+    SignalLogger.writeDoubleArray("DriveState/Pose", m_poseArray);
+    SignalLogger.writeDoubleArray("DriveState/ModuleStates", m_moduleStatesArray);
+    SignalLogger.writeDoubleArray("DriveState/ModuleTargets", m_moduleTargetsArray);
+    SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
+
+    // intake
+    SmartDashboard.putNumber("Intake/Extendo Inches", intakeExtendo.getExtendoInches());
+    SmartDashboard.putNumber(
+        "Intake/Extendo Target Inches", intakeExtendo.getExtendoTargetInches());
+    SmartDashboard.putNumber(
+        "Intake/Extendo Error Inches",
+        intakeExtendo.getExtendoInches() - intakeExtendo.getExtendoTargetInches());
+
+    /* Telemeterize the pose to Field2d for Elastic dashboard */
+    field2d.setRobotPose(state.Pose);
+
+    /* Telemeterize the module states to a Mechanism2d */
+    for (int i = 0; i < 4; ++i) {
+      m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
+      m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
+      m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
+
+      SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+    }
+
+    /* Elastic dashboard telemetry */
+    SmartDashboard.putBoolean("Flywheel Up to Speed", flywheel.isVelocityWithinTolerance());
+    // SmartDashboard.putBoolean("Shooter Being Fed",
+    //         flywheel.isVelocityWithinTolerance() && hopper.isFeeding());
+    SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
+    double matchTime = DriverStation.getMatchTime();
+    SmartDashboard.putNumber("Match Time (FMS)", Double.isFinite(matchTime) ? matchTime : -1.0);
+    SmartDashboard.putNumber("Flywheel Velocity", flywheel.getFlywheelRPM());
+    SmartDashboard.putNumber("Requested Flywheel Velocity", flywheel.getRequestedRPM());
+    var distanceToTag = vision.getDistanceToTag10();
+    SmartDashboard.putNumber(
+        "Distance to Tag",
+        distanceToTag.orElse(-1.0)); // PhotonVision range, used for flywheel interpolation
+
+    // Update flywheel feedforward values from editable dashboard entries
+    double ks = flywheelFFKS.get();
+    double kv = flywheelFFKV.get();
+    double ka = flywheelFFKA.get();
+
+    if (Math.abs(ks - flywheel.getFeedforwardKS()) > 1e-6) flywheel.setFeedforwardKS(ks);
+    if (Math.abs(kv - flywheel.getFeedforwardKV()) > 1e-6) flywheel.setFeedforwardKV(kv);
+    if (Math.abs(ka - flywheel.getFeedforwardKA()) > 1e-6) flywheel.setFeedforwardKA(ka);
+
+    // Publish current flywheel feedforward values to dashboard
+    SmartDashboard.putNumber("Flywheel FF KS", flywheel.getFeedforwardKS());
+    SmartDashboard.putNumber("Flywheel FF KV", flywheel.getFeedforwardKV());
+    SmartDashboard.putNumber("Flywheel FF KA", flywheel.getFeedforwardKA());
+    SmartDashboard.putNumber("Robot Pose X", state.Pose.getX());
+    SmartDashboard.putNumber("Robot Pose Y", state.Pose.getY());
+    SmartDashboard.putNumber("Robot Pose Rotation", state.Pose.getRotation().getRadians());
+    SmartDashboard.putNumberArray(
+        "Swerve Positions Radians",
+        new double[] {
+          state.ModuleStates[0].angle.getRadians(),
+          state.ModuleStates[1].angle.getRadians(),
+          state.ModuleStates[2].angle.getRadians(),
+          state.ModuleStates[3].angle.getRadians()
+        });
+    String robotState =
+        RobotState.isDisabled()
+            ? "Disabled"
+            : RobotState.isAutonomous()
+                ? "Autonomous"
+                : RobotState.isTeleop() ? "Teleop" : RobotState.isTest() ? "Test" : "Unknown";
+    SmartDashboard.putString("Robot State", robotState);
+
+    Pose2d robotPose = state.Pose;
+    int tagId =
+        DriverStation.getAlliance()
+            .map(
+                alliance ->
+                    alliance == DriverStation.Alliance.Red
+                        ? FieldConstants.RED_SHOOT_TAG
+                        : FieldConstants.BLUE_SHOOT_TAG)
+            .orElse(FieldConstants.RED_SHOOT_TAG);
+
+    Optional<Pose2d> maybeTargetPose =
+        RobotLocalization.fieldPoseFromTagTransform(tagId, FieldConstants.RightTagToHub);
+
+    if (maybeTargetPose.isPresent()) {
+      Pose2d targetPose = maybeTargetPose.get();
+      Pose2d shooterExitPose = RobotLocalization.robotToShooterExitPose(robotPose);
+
+      ShotSolution shotSolution =
+          ShootOnMoveUtil.solve(
+              robotPose, fieldRelativeSpeedsSupplier.get(), targetPose.getTranslation());
+
+      double staticShooterExitDistance =
+          RobotLocalization.shooterExitToTargetDistanceMeters(robotPose, targetPose);
+
+      SmartDashboard.putNumber("Shot/Static ShooterExit Distance", staticShooterExitDistance);
+      SmartDashboard.putNumber("Shot/Predicted Effective Distance", shotSolution.effectiveDistance);
+      SmartDashboard.putNumber("Shot/Raw Distance", shotSolution.rawDistance);
+      SmartDashboard.putNumber("Shot/TOF", shotSolution.timeOfFlight);
+      SmartDashboard.putNumber(
+          "Shot/Target RPM Static",
+          FlywheelInterpolation.interpolateRPM(staticShooterExitDistance));
+      SmartDashboard.putNumber(
+          "Shot/Target RPM Effective",
+          FlywheelInterpolation.interpolateRPM(shotSolution.effectiveDistance));
+
+      SmartDashboard.putNumber("Shot/ShooterExit X", shooterExitPose.getX());
+      SmartDashboard.putNumber("Shot/ShooterExit Y", shooterExitPose.getY());
+      SmartDashboard.putNumber("Shot/PredictedExit X", shotSolution.predictedExitPoint.getX());
+      SmartDashboard.putNumber("Shot/PredictedExit Y", shotSolution.predictedExitPoint.getY());
+      SmartDashboard.putNumber("Shot/ExitVel X", shotSolution.shooterExitVelocityField.getX());
+      SmartDashboard.putNumber("Shot/ExitVel Y", shotSolution.shooterExitVelocityField.getY());
+
+      field2d.getObject("Hub Center").setPose(targetPose);
+      field2d.getObject("Shooter Exit").setPose(shooterExitPose);
+      field2d
+          .getObject("Predicted Exit")
+          .setPose(new Pose2d(shotSolution.predictedExitPoint, Rotation2d.kZero));
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.5524,
+        "y": 5.954655555555555
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5524,
+        "y": 5.954655555555555
+      },
+      "isLocked": false,
+      "linkedName": "CenterDepotEnd"
+    },
+    {
+      "anchor": {
+        "x": 2.4127469879518073,
+        "y": 5.63044578313253
+      },
+      "prevControl": {
+        "x": 1.342060240963856,
+        "y": 5.986216867469879
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 143.39292518739254
+  },
+  "reversed": false,
+  "folder": "FastCenter",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

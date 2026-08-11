@@ -1,0 +1,36 @@
+# Gradle and Java build output
+.gradle/
+build/
+bin/
+out/
+*.class
+
+# IDE-local files
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# Codex/agent-local workspace metadata
+.agents/
+.codex/
+
+# Robot simulation/runtime output
+ctre_sim/
+networktables.json
+*.wpilog
+logs/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local environment and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+

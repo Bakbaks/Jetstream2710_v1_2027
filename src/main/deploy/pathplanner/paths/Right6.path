@@ -1,0 +1,65 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.9392724679029953,
+        "y": 2.7346647646219684
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.4038444444444447,
+        "y": 2.5635888888888894
+      },
+      "isLocked": false,
+      "linkedName": "RReturnEnd"
+    },
+    {
+      "anchor": {
+        "x": 2.47,
+        "y": 2.3899999999999997
+      },
+      "prevControl": {
+        "x": 2.0612497543192276,
+        "y": 2.675375502008031
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "RBumpShootingPosition"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 4.64,
+        "y": 4.04
+      },
+      "rotationOffset": 180.0,
+      "minWaypointRelativePos": 0.23920595533498956,
+      "maxWaypointRelativePos": 1.0,
+      "name": "Point Towards Zone"
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.25,
+    "rotation": -140.55065176567277
+  },
+  "reversed": false,
+  "folder": "Right",
+  "idealStartingState": {
+    "velocity": 0.5,
+    "rotation": -44.119
+  },
+  "useDefaultConstraints": false
+}

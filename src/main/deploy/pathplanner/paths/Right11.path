@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.9919156626506025,
+        "y": 2.723674698795181
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.7187228915662653,
+        "y": 2.461409638554217
+      },
+      "isLocked": false,
+      "linkedName": "RSecondReturnEnd"
+    },
+    {
+      "anchor": {
+        "x": 2.47,
+        "y": 2.3899999999999997
+      },
+      "prevControl": {
+        "x": 2.271305845350017,
+        "y": 2.7506144578313245
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "RBumpShootingPosition"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -140.55065176567277
+  },
+  "reversed": false,
+  "folder": "Right",
+  "idealStartingState": {
+    "velocity": 0.5,
+    "rotation": -35.44571032759833
+  },
+  "useDefaultConstraints": true
+}
