@@ -20,15 +20,15 @@ public final class DriveCommands {
       DoubleSupplier translationX,
       DoubleSupplier translationY,
       DoubleSupplier rotation) {
-    double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-    double maxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
+    double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)-1.0;
+    double maxAngularRate = RotationsPerSecond.of(1.0).in(RadiansPerSecond);
     var request =
         new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     return drivetrain.applyRequest(
         () ->
             request
-                .withVelocityX(-DriveInput.exponential(translationX.getAsDouble(), 3) * maxSpeed)
-                .withVelocityY(-DriveInput.exponential(translationY.getAsDouble(), 3) * maxSpeed)
+                .withVelocityX(-DriveInput.exponential(translationX.getAsDouble(), 2) * maxSpeed)
+                .withVelocityY(-DriveInput.exponential(translationY.getAsDouble(), 2) * maxSpeed)
                 .withRotationalRate(
                     -DriveInput.exponential(rotation.getAsDouble(), 2) * maxAngularRate));
   }
