@@ -5,7 +5,6 @@ import org.wpilib.command2.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   private final RobotContainer robotContainer;
@@ -13,9 +12,6 @@ public class Robot extends LoggedRobot {
 
   public Robot() {
     Logger.recordMetadata("ProjectName", "Jetstream2710_v1_2027");
-    if (isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter());
-    }
     Logger.addDataReceiver(new NT4Publisher());
     Logger.start();
     robotContainer = new RobotContainer();

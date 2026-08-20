@@ -25,7 +25,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIOReal;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIOReal;
 import frc.robot.subsystems.vision.VisionIOSim;
 import frc.robot.superstructure.Superstructure;
 import frc.robot.superstructure.Superstructure.Goal;
@@ -43,9 +42,7 @@ public class RobotContainer {
   private final Intake intake =
       new Intake(RobotBase.isReal() ? new IntakeIOReal() : new IntakeIOSim());
   private final Vision vision =
-      new Vision(
-          RobotBase.isReal() ? new VisionIOReal() : new VisionIOSim(),
-          drivetrain::addVisionMeasurement);
+      new Vision(new VisionIOSim(), drivetrain::addVisionMeasurement);
   private final ShotCalculator shotCalculator = new ShotCalculator(robotState, new ShotTable());
   private final ShotVerifier shotVerifier = new ShotVerifier(robotState, shooter);
   private final Superstructure superstructure =
