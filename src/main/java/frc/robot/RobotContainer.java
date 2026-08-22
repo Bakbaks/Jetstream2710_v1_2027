@@ -101,21 +101,21 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(
             Commands.parallel(
-                intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOW)
+                intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOP)
             ));
 
     auxController 
         .leftTrigger()
         .whileTrue(
             Commands.parallel(
-                intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY)
+                intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.STOP)
             ));
 
     auxController
         .leftBumper()
         .whileTrue(
             Commands.parallel(
-                intake.goalCommand(Intake.Goal.EJECT, Intake.Goal.DEPLOY),
+                intake.goalCommand(Intake.Goal.EJECT, Intake.Goal.STOP),
                 hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)
             ));
 

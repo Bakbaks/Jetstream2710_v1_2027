@@ -26,7 +26,7 @@ public class Hopper extends SubsystemBase {
     Logger.processInputs("Hopper", inputs);
     switch (goal) {
       case STOP -> io.stop();
-      case HOLD -> io.setVelocityRPM(HopperConstants.HOLD_FLOOR_RPM, 0.0);
+      case HOLD -> io.setVelocityRPM(0.0, 0.0);
       case FEED ->
           io.setVelocityRPM(HopperConstants.FEED_FLOOR_RPM, HopperConstants.FEED_FEEDER_RPM);
       case REVERSE -> io.setVelocityRPM(HopperConstants.REVERSE_RPM, HopperConstants.REVERSE_RPM);
