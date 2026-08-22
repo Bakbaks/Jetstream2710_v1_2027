@@ -10,6 +10,7 @@ public class Intake extends SubsystemBase {
     DEPLOY,
     INTAKE,
     EJECT,
+    COMPRESSION,
     STOP
   }
 
@@ -42,6 +43,10 @@ public class Intake extends SubsystemBase {
         io.setExtensionPositionInches(IntakeConstants.EXTENDED_INCHES);
         io.setRollerVoltage(IntakeConstants.ROLLER_EJECT_VOLTS);
       }
+      case COMPRESSION -> {
+        io.setExtensionPositionInches(IntakeConstants.RETRACTED_INCHES);
+        io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
+      }
       case STOP -> io.setRollerVoltage(0.0);
     }
     Logger.recordOutput("Intake/Goal", goal);
@@ -68,7 +73,7 @@ public class Intake extends SubsystemBase {
     double target =
         switch (goal) {
           case DEPLOY, INTAKE, EJECT -> IntakeConstants.EXTENDED_INCHES;
-          case STOW -> IntakeConstants.RETRACTED_INCHES;
+          case STOW, COMPRESSION -> IntakeConstants.RETRACTED_INCHES;
           case STOP -> inputs.extensionPositionInches;
         };
     return Math.abs(inputs.extensionPositionInches - target)

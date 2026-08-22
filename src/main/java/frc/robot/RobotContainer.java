@@ -5,7 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import java.util.Optional;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandNiDsXboxController;//verify is it CommandGamepad or CommandJoystick or CommandNiDsXboxController
+import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.framework.RobotBase;
@@ -52,9 +52,8 @@ public class RobotContainer {
           drivetrain::addVisionMeasurement);
   private final ShotCalculator shotCalculator = new ShotCalculator(robotState, new ShotTable());
   private final ShotVerifier shotVerifier = new ShotVerifier(robotState, shooter);
-  private final CommandNiDsXboxController driverController =
-      new CommandNiDsXboxController(DRIVER_PORT);
-  private final CommandNiDsXboxController auxController = new CommandNiDsXboxController(AUX_PORT);
+  private final CommandGamepad driverController = new CommandGamepad(DRIVER_PORT);
+  private final CommandGamepad auxController = new CommandGamepad(AUX_PORT);
   private SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -69,23 +68,23 @@ public class RobotContainer {
             driverController::getLeftY,
             driverController::getLeftX,
             driverController::getRightX));
-    driverController.povDown().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+    driverController.dpadDown().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-    driverController
+    auxController
         .rightTrigger()
         .whileTrue(
+            Commands.parallel(
             Commands.startEnd(
                 () -> {
                   shooter.setShotRPM(ShooterConstants.DEFAULT_SHOT_RPM);
                   shooter.setGoal(Shooter.Goal.SHOOT);
                 },
                 () -> shooter.setGoal(Shooter.Goal.STOP),
-                shooter));
-    driverController
+                shooter)));
+    auxController
         .leftTrigger()
         .whileTrue(
             Commands.parallel(
-                shooter.goalCommand(Shooter.Goal.IDLE, Shooter.Goal.IDLE),
                 hopper.goalCommand(Hopper.Goal.HOLD, Hopper.Goal.HOLD),
                 intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY)));
     
