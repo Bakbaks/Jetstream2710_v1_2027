@@ -114,6 +114,11 @@ public class IntakeIOReal implements IntakeIO {
             Rotations.of(positionInches / IntakeConstants.INCHES_PER_PINION_ROTATION)));
   }
 
+  public void setExtensionPositionRotations(double rotations){
+    extensionMotor.setControl(
+      extensionRequest.withPosition(Rotations.of(rotations)));
+  }
+
   @Override
   public void setRollerVoltage(double volts) {
     for (TalonFX motor : rollerMotors) {

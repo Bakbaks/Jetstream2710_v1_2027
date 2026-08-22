@@ -24,6 +24,8 @@ public interface IntakeIO {
 
   default void setExtensionPositionInches(double positionInches) {}
 
+  default void setExtensionPositionRotations(double positionInches) {}
+
   default void setRollerVoltage(double volts) {}
 
   default void setExtensionEncoderZero() {}

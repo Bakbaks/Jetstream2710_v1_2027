@@ -88,6 +88,7 @@ public class RobotContainer {
                 shooter.goalCommand(Shooter.Goal.IDLE, Shooter.Goal.IDLE),
                 hopper.goalCommand(Hopper.Goal.HOLD, Hopper.Goal.HOLD),
                 intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY)));
+    
   }
 
 

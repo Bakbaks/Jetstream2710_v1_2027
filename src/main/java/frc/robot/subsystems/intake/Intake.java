@@ -31,11 +31,11 @@ public class Intake extends SubsystemBase {
         io.setRollerVoltage(0.0);
       }
       case DEPLOY -> {
-        io.setExtensionPositionInches(IntakeConstants.EXTENDED_INCHES);
+        io.setExtensionPositionRotations(IntakeConstants.EXTENDED_ROTATIONS);
         io.setRollerVoltage(0.0);
       }
       case INTAKE -> {
-        io.setExtensionPositionInches(IntakeConstants.EXTENDED_INCHES);
+        io.setExtensionPositionRotations(IntakeConstants.EXTENDED_ROTATIONS);
         io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
       }
       case EJECT -> {
