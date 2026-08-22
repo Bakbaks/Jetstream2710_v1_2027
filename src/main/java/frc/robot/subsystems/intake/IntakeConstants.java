@@ -2,7 +2,7 @@ package frc.robot.subsystems.intake;
 
 public final class IntakeConstants {
   public static final double ROLLER_INTAKE_VOLTS = 8.0;
-  public static final double ROLLER_EJECT_VOLTS = -9.0;
+  public static final double ROLLER_EJECT_VOLTS = -8.0;
   public static final double RETRACTED_INCHES = 0.0;
   public static final double EXTENDED_INCHES = 6.0;
   public static final double EXTENDED_ROTATIONS = 5.0;

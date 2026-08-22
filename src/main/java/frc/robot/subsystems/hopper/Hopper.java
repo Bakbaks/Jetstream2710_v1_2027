@@ -9,8 +9,7 @@ public class Hopper extends SubsystemBase {
     STOP,
     HOLD,
     FEED,
-    REVERSE,
-    UNJAM
+    REVERSE
   }
 
   private final HopperIO io;
@@ -31,7 +30,6 @@ public class Hopper extends SubsystemBase {
       case FEED ->
           io.setVelocityRPM(HopperConstants.FEED_FLOOR_RPM, HopperConstants.FEED_FEEDER_RPM);
       case REVERSE -> io.setVelocityRPM(HopperConstants.REVERSE_RPM, HopperConstants.REVERSE_RPM);
-      case UNJAM -> io.setVelocityRPM(HopperConstants.UNJAM_RPM, 0.0);
     }
     Logger.recordOutput("Hopper/Goal", goal);
   }

@@ -93,8 +93,31 @@ public class RobotContainer {
         .whileTrue(
             Commands.parallel(
                 intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOW)
-            )
-        );
+            ));
+
+    auxController 
+        .leftTrigger()
+        .whileTrue(
+            Commands.parallel(
+                intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY)
+            ));
+
+    auxController
+        .leftBumper()
+        .whileTrue(
+            Commands.parallel(
+                intake.goalCommand(Intake.Goal.EJECT, Intake.Goal.DEPLOY),
+                hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)
+            ));
+
+
+    auxController
+        .rightBumper()
+        .whileTrue(
+            Commands.parallel(
+                hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)
+            ));
+
     
     
   }
