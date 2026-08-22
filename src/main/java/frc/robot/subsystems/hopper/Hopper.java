@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hopper;
 
+import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,5 +41,13 @@ public class Hopper extends SubsystemBase {
 
   public Goal getGoal() {
     return goal;
+  }
+
+  public Command goalCommand(Goal requestedGoal, Goal endGoal) {
+    return startEnd(() -> setGoal(requestedGoal), () -> setGoal(endGoal));
+  }
+
+  public Command setGoalCommand(Goal requestedGoal) {
+    return runOnce(() -> setGoal(requestedGoal));
   }
 }

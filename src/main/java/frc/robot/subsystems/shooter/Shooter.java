@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import org.wpilib.math.util.MathUtil;
+import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
 import java.util.Arrays;
@@ -11,15 +12,13 @@ public class Shooter extends SubsystemBase {
     STOP,
     IDLE,
     SHOOT,
-    REVERSE,
-    CHARACTERIZE
+    REVERSE
   }
 
   private final ShooterIO io;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private Goal goal = Goal.STOP;
   private double requestedShotRPM = ShooterConstants.DEFAULT_SHOT_RPM;
-  private double characterizationVolts;
   private double setpointRPM;
 
   public Shooter(ShooterIO io) {
@@ -39,7 +38,6 @@ public class Shooter extends SubsystemBase {
       case IDLE -> runVelocity(ShooterConstants.IDLE_RPM);
       case SHOOT -> runVelocity(requestedShotRPM);
       case REVERSE -> runVelocity(ShooterConstants.REVERSE_RPM);
-      case CHARACTERIZE -> io.setVoltage(characterizationVolts);
     }
 
     Logger.recordOutput("Shooter/Goal", goal);
@@ -63,13 +61,16 @@ public class Shooter extends SubsystemBase {
     return goal;
   }
 
-  public void setShotRPM(double rpm) {
-    requestedShotRPM = rpm;
+  public Command goalCommand(Goal requestedGoal, Goal endGoal) {
+    return startEnd(() -> setGoal(requestedGoal), () -> setGoal(endGoal));
   }
 
-  public void setCharacterizationVolts(double volts) {
-    characterizationVolts = volts;
-    goal = Goal.CHARACTERIZE;
+  public Command setGoalCommand(Goal requestedGoal) {
+    return runOnce(() -> setGoal(requestedGoal));
+  }
+
+  public void setShotRPM(double rpm) {
+    requestedShotRPM = rpm;
   }
 
   public boolean isReady() {
