@@ -74,13 +74,22 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(
             Commands.parallel(
-            Commands.startEnd(
-                () -> {
-                  shooter.setShotRPM(ShooterConstants.DEFAULT_SHOT_RPM);
-                  shooter.setGoal(Shooter.Goal.SHOOT);
-                },
-                () -> shooter.setGoal(Shooter.Goal.STOP),
-                shooter)));
+                Commands.startEnd(
+                    () -> {
+                      shooter.setShotRPM(ShooterConstants.DEFAULT_SHOT_RPM);
+                      shooter.setGoal(Shooter.Goal.SHOOT);
+                    },
+                    () -> shooter.setGoal(Shooter.Goal.STOP),
+                    shooter),
+                Commands.run(
+                        () ->
+                            hopper.setGoal(
+                                shooter.isReady()
+                                    ? Hopper.Goal.FEED
+                                    : Hopper.Goal.HOLD),
+                        hopper)
+                    .finallyDo(() -> hopper.setGoal(Hopper.Goal.STOP))));
+                
     driverController
         .leftTrigger()
         .whileTrue(
@@ -117,6 +126,10 @@ public class RobotContainer {
             Commands.parallel(
                 hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)
             ));
+
+    auxController.southFace().onTrue(Commands.parallel(
+        shooter.goalCommand(Shooter.Goal.PREP, Shooter.Goal.PREP)
+    ));
 
     
     
