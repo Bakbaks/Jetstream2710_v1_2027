@@ -70,7 +70,7 @@ public class RobotContainer {
             driverController::getRightX));
     driverController.dpadDown().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-    auxController
+    driverController
         .rightTrigger()
         .whileTrue(
             Commands.parallel(
@@ -81,12 +81,21 @@ public class RobotContainer {
                 },
                 () -> shooter.setGoal(Shooter.Goal.STOP),
                 shooter)));
-    auxController
+    driverController
         .leftTrigger()
         .whileTrue(
             Commands.parallel(
                 hopper.goalCommand(Hopper.Goal.HOLD, Hopper.Goal.HOLD),
                 intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY)));
+    
+    auxController
+        .rightTrigger()
+        .whileTrue(
+            Commands.parallel(
+                intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOW)
+            )
+        );
+    
     
   }
 
