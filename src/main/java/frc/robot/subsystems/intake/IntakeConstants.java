@@ -5,8 +5,11 @@ public final class IntakeConstants {
   public static final double ROLLER_EJECT_VOLTS = -8.0;
   public static final double RETRACTED_INCHES = 0.0;
   public static final double EXTENDED_INCHES = 6.0;
-  public static final double EXTENDED_ROTATIONS = 5.0;
+  public static final double EXTENDED_ROTATIONS = 3.0;
+  public static final double RETRACTED_ROTATIONS = -0.25;
+
   public static final double POSITION_TOLERANCE_INCHES = 0.25;
+  public static final double POSITION_TOLERANCE_ROTATIONS = 0.25;
   public static final double MOTOR_TO_PINION_REDUCTION = 5.0;
   public static final double INCHES_PER_PINION_ROTATION = Math.PI / 3.0;
   public static final double EXTENSION_STATOR_LIMIT_AMPS = 60.0;

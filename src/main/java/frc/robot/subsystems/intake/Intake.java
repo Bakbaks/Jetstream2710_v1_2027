@@ -28,7 +28,7 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
     switch (goal) {
       case STOW -> {
-        io.setExtensionPositionInches(IntakeConstants.RETRACTED_INCHES);
+        io.setExtensionPositionRotations(IntakeConstants.RETRACTED_ROTATIONS);
         io.setRollerVoltage(0.0);
       }
       case DEPLOY -> {
@@ -40,11 +40,11 @@ public class Intake extends SubsystemBase {
         io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
       }
       case EJECT -> {
-        io.setExtensionPositionInches(IntakeConstants.EXTENDED_INCHES);
+        io.setExtensionPositionRotations(IntakeConstants.EXTENDED_ROTATIONS);
         io.setRollerVoltage(IntakeConstants.ROLLER_EJECT_VOLTS);
       }
       case COMPRESSION -> {
-        io.setExtensionPositionInches(IntakeConstants.RETRACTED_INCHES);
+        io.setExtensionPositionRotations(IntakeConstants.RETRACTED_ROTATIONS);
         io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
       }
       case STOP -> io.setRollerVoltage(0.0);
@@ -72,12 +72,13 @@ public class Intake extends SubsystemBase {
   public boolean isAtExtensionGoal() {
     double target =
         switch (goal) {
-          case DEPLOY, INTAKE, EJECT -> IntakeConstants.EXTENDED_INCHES;
-          case STOW, COMPRESSION -> IntakeConstants.RETRACTED_INCHES;
-          case STOP -> inputs.extensionPositionInches;
+          case DEPLOY, INTAKE, EJECT -> IntakeConstants.EXTENDED_ROTATIONS;
+          case STOW, COMPRESSION -> 0.0;
+          case STOP -> inputs.extensionPositionRotations;
         };
-    return Math.abs(inputs.extensionPositionInches - target)
-        <= IntakeConstants.POSITION_TOLERANCE_INCHES;
+    return Math.abs(inputs.extensionPositionRotations - target)
+        <= IntakeConstants.POSITION_TOLERANCE_ROTATIONS;
+
   }
 
   public void zeroExtensionEncoder() {

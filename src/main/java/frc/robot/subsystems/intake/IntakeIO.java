@@ -8,6 +8,7 @@ public interface IntakeIO {
     public boolean extensionConnected;
     public boolean[] rollerConnected = new boolean[2];
     public double extensionPositionInches;
+    public double extensionPositionRotations;
     public double extensionVelocityRPM;
     public double extensionAppliedVolts;
     public double extensionSupplyCurrentAmps;
