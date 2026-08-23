@@ -17,6 +17,7 @@ public class Intake extends SubsystemBase {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private Goal goal = Goal.STOW;
+  private double holdPositionRotations;
 
   public Intake(IntakeIO io) {
     this.io = io;
@@ -47,13 +48,19 @@ public class Intake extends SubsystemBase {
         io.setExtensionPositionRotations(IntakeConstants.RETRACTED_ROTATIONS);
         io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
       }
-      case STOP -> io.setRollerVoltage(0.0);
+      case STOP -> {
+        io.setExtensionPositionRotations(holdPositionRotations);
+        io.setRollerVoltage(0.0);
+      }
     }
     Logger.recordOutput("Intake/Goal", goal);
     Logger.recordOutput("Intake/AtExtensionGoal", isAtExtensionGoal());
   }
 
   public void setGoal(Goal goal) {
+    if (goal == Goal.STOP && this.goal != Goal.STOP) {
+      holdPositionRotations = inputs.extensionPositionRotations;
+    }
     this.goal = goal;
   }
 

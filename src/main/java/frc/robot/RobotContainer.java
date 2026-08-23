@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import java.util.Optional;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
@@ -9,6 +10,7 @@ import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.framework.RobotBase;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
@@ -36,6 +38,8 @@ import frc.robot.subsystems.vision.VisionIOSim;
 public class RobotContainer {
   private static final int DRIVER_PORT = 0;
   private static final int AUX_PORT = 1;
+  private static final Rotation2d BLUE_PASS_HEADING = Rotation2d.fromDegrees(90.0);
+  private static final Rotation2d RED_PASS_HEADING = Rotation2d.fromDegrees(-90.0);
 
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final RobotState robotState =
@@ -54,6 +58,8 @@ public class RobotContainer {
   private final ShotVerifier shotVerifier = new ShotVerifier(robotState, shooter);
   private final CommandGamepad driverController = new CommandGamepad(DRIVER_PORT);
   private final CommandGamepad auxController = new CommandGamepad(AUX_PORT);
+  private final SwerveRequest.SwerveDriveBrake brakeRequest =
+      new SwerveRequest.SwerveDriveBrake();
   private SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -93,23 +99,65 @@ public class RobotContainer {
     driverController
         .leftTrigger()
         .whileTrue(
+            intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY));
+
+    driverController
+        .rightBumper()
+        .toggleOnTrue(
             Commands.parallel(
-                hopper.goalCommand(Hopper.Goal.HOLD, Hopper.Goal.HOLD),
-                intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY)));
+                Commands.run(
+                        () -> {
+                          var shotSolution = shotCalculator.calculate(getAllianceTarget());
+                          shooter.setShotRPM(shotSolution.shooterRPM());
+                          shooter.setGoal(Shooter.Goal.AIM);
+                        },
+                        shooter)
+                    .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP)),
+                DriveCommands.joystickDriveAtHeading(
+                    drivetrain,
+                    driverController::getLeftY,
+                    driverController::getLeftX,
+                    () -> shotCalculator.calculate(getAllianceTarget()).desiredHeading())));
+
+    driverController
+        .leftBumper()
+        .toggleOnTrue(
+            Commands.parallel(
+                Commands.startEnd(
+                    () -> {
+                      shooter.setShotRPM(ShooterConstants.PASS_RPM);
+                      shooter.setGoal(Shooter.Goal.AIM);
+                    },
+                    () -> shooter.setGoal(Shooter.Goal.STOP),
+                    shooter),
+                DriveCommands.joystickDriveAtHeading(
+                    drivetrain,
+                    driverController::getLeftY,
+                    driverController::getLeftX,
+                    () ->
+                        MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED
+                            ? RED_PASS_HEADING
+                            : BLUE_PASS_HEADING)));
+
+    driverController
+        .southFace()
+        .whileTrue(
+            DriveCommands.highwayAssist(
+                drivetrain,
+                robotState::getPose,
+                driverController::getLeftX,
+                driverController::getLeftY,
+                driverController::getRightX));
     
     auxController
         .rightTrigger()
         .whileTrue(
-            Commands.parallel(
-                intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOP)
-            ));
+            intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOP));
 
     auxController 
         .leftTrigger()
         .whileTrue(
-            Commands.parallel(
-                intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.STOP)
-            ));
+            intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.STOP));
 
     auxController
         .leftBumper()
@@ -123,13 +171,23 @@ public class RobotContainer {
     auxController
         .rightBumper()
         .whileTrue(
-            Commands.parallel(
-                hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)
-            ));
+            hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP));
 
-    auxController.southFace().onTrue(Commands.parallel(
-        shooter.goalCommand(Shooter.Goal.PREP, Shooter.Goal.PREP)
-    ));
+    auxController
+        .westFace()
+        .whileTrue(drivetrain.applyRequest(() -> brakeRequest));
+
+    auxController
+        .southFace()
+        .toggleOnTrue(
+            Commands.run(
+                    () -> {
+                      var shotSolution = shotCalculator.calculate(getAllianceTarget());
+                      shooter.setShotRPM(shotSolution.shooterRPM());
+                      shooter.setGoal(Shooter.Goal.PREP);
+                    },
+                    shooter)
+                .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP)));
 
     
     
