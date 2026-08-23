@@ -3,34 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.47,
-        "y": 2.3899999999999997
+        "x": 2.8616405135520675,
+        "y": 6.991483594864479
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.71934198992833,
-        "y": 3.340710843373494
+        "x": 3.0039657631954344,
+        "y": 7.224379457917262
       },
       "isLocked": false,
-      "linkedName": "RBumpShootingPosition"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.909614457831326,
-        "y": 2.4286265060240964
+        "x": 4.0,
+        "y": 7.496091298145506
       },
       "prevControl": {
-        "x": 4.909614457831326,
-        "y": 2.4286265060240964
+        "x": 3.5076504446639216,
+        "y": 7.496091298145506
+      },
+      "nextControl": {
+        "x": 5.086924374012169,
+        "y": 7.496091298145506
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 14.0,
+        "y": 7.496
+      },
+      "prevControl": {
+        "x": 13.197385870797225,
+        "y": 7.496
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RSecondBumpEnd"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.23153526970954885,
+      "waypointRelativePos": 0.99,
       "rotationDegrees": 0.0
     }
   ],
@@ -46,14 +62,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
+    "velocity": 4.0,
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Right",
+  "folder": "New Folder",
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": -140.55065176567277
+    "velocity": 1.5,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
