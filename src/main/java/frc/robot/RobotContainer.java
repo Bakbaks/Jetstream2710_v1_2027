@@ -38,8 +38,8 @@ import frc.robot.subsystems.vision.VisionIOSim;
 public class RobotContainer {
   private static final int DRIVER_PORT = 0;
   private static final int AUX_PORT = 1;
-  private static final Rotation2d BLUE_PASS_HEADING = Rotation2d.fromDegrees(90.0);
-  private static final Rotation2d RED_PASS_HEADING = Rotation2d.fromDegrees(-90.0);
+  private static final Rotation2d PASS_HEADING = Rotation2d.fromDegrees(180.0);
+  private static final double DRIVER_ROTATION_OVERRIDE_THRESHOLD = 0.15;
 
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final RobotState robotState =
@@ -95,11 +95,10 @@ public class RobotContainer {
                                     : Hopper.Goal.HOLD),
                         hopper)
                     .finallyDo(() -> hopper.setGoal(Hopper.Goal.STOP))));
-                
+
     driverController
         .leftTrigger()
-        .whileTrue(
-            intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY));
+        .whileTrue(intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY));
 
     driverController
         .rightBumper()
@@ -117,7 +116,8 @@ public class RobotContainer {
                     drivetrain,
                     driverController::getLeftY,
                     driverController::getLeftX,
-                    () -> shotCalculator.calculate(getAllianceTarget()).desiredHeading())));
+                    () -> shotCalculator.calculate(getAllianceTarget()).desiredHeading()))
+                .until(this::hasDriverRotationOverride));
 
     driverController
         .leftBumper()
@@ -134,10 +134,8 @@ public class RobotContainer {
                     drivetrain,
                     driverController::getLeftY,
                     driverController::getLeftX,
-                    () ->
-                        MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED
-                            ? RED_PASS_HEADING
-                            : BLUE_PASS_HEADING)));
+                    () -> PASS_HEADING))
+                .until(this::hasDriverRotationOverride));
 
     driverController
         .southFace()
@@ -148,7 +146,7 @@ public class RobotContainer {
                 driverController::getLeftX,
                 driverController::getLeftY,
                 driverController::getRightX));
-    
+
     auxController
         .rightTrigger()
         .whileTrue(
@@ -235,6 +233,10 @@ public class RobotContainer {
 
   public void periodic() {
     robotState.periodic();
+  }
+
+  private boolean hasDriverRotationOverride() {
+    return Math.abs(driverController.getRightX()) > DRIVER_ROTATION_OVERRIDE_THRESHOLD;
   }
 
   public Command getAutonomousCommand() {
