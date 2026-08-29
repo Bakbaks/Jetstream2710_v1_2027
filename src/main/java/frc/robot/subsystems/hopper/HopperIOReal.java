@@ -24,7 +24,7 @@ public class HopperIOReal implements HopperIO {
   private static final int FLOOR_LEFT_ID = 30;
   private static final int FLOOR_RIGHT_ID = 62;
   private static final int FEEDER_LEFT_ID = 52;
-  private static final int FEEDER_RIGHT_ID = 51;
+  private static final int FEEDER_RIGHT_ID = 20; // needs to be 51
 
   private final TalonFX[] motors = {
     new TalonFX(FLOOR_LEFT_ID, Ports.RIO_CAN_BUS),

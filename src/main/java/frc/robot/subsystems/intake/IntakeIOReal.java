@@ -25,7 +25,7 @@ import frc.robot.Ports;
 public class IntakeIOReal implements IntakeIO {
   private static final int EXTENSION_MOTOR_ID = 12;
   private static final int ROLLER_LEFT_ID = 13;
-  private static final int ROLLER_RIGHT_ID = 20;
+  private static final int ROLLER_RIGHT_ID = 51;
   private final TalonFX extensionMotor = new TalonFX(EXTENSION_MOTOR_ID, Ports.RIO_CAN_BUS);
   private final TalonFX[] rollerMotors = {
     new TalonFX(ROLLER_LEFT_ID, Ports.RIO_CAN_BUS), new TalonFX(ROLLER_RIGHT_ID, Ports.RIO_CAN_BUS)

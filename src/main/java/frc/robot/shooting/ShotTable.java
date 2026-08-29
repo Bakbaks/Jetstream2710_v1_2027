@@ -9,10 +9,10 @@ public final class ShotTable {
   private final InterpolatingDoubleTreeMap timeOfFlightTable = new InterpolatingDoubleTreeMap();
 
   public ShotTable() {
-    rpmTable.put(1.7, 1250.0);
-    rpmTable.put(3.0, 1450.0);
-    rpmTable.put(3.6, 1590.0);
-    rpmTable.put(4.3, 1670.0);
+    rpmTable.put(1.7, 1600.0);
+    rpmTable.put(2.5, 1600.0);
+    rpmTable.put(3.0, 1700.0);
+    rpmTable.put(5.0, 2000.0);
     timeOfFlightTable.put(1.7, 0.75);
     timeOfFlightTable.put(3.0, 0.905);
     timeOfFlightTable.put(3.6, 1.085);

@@ -14,17 +14,17 @@ import org.wpilib.math.util.Units;
 public final class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  public static final String[] CAMERA_NAMES = {"dave", "crazy", "wabbo"};
+  public static final String[] CAMERA_NAMES = {"Cam3", "Cam1", "Cam2"};
   public static final Transform3d[] ROBOT_TO_CAMERAS = {
     new Transform3d(
-        new Translation3d(-0.0301625, 0.367665, 0.5381625),
-        new Rotation3d(0.0, 0.0, Math.PI / 2.0)),
+        new Translation3d(-0.0141, 0.383, 0.484),
+        new Rotation3d(Units.degreesToRadians(45), 0.0, Math.PI / 2.0)),
     new Transform3d(
-        new Translation3d(-0.2645918, 0.0, 0.452630667),
-        new Rotation3d(Math.PI, Units.degreesToRadians(21.75), Math.PI)),
+        new Translation3d(-0.2441, 0.0, 0.163),
+        new Rotation3d(Math.PI, Units.degreesToRadians(30), Math.PI)),
     new Transform3d(
-        new Translation3d(-0.0301625, -0.367665, 0.5381625),
-        new Rotation3d(0.0, 0.0, -Math.PI / 2.0))
+        new Translation3d(-0.0141, -0.383, 0.484),
+        new Rotation3d(Units.degreesToRadians(-45), 0.0, -Math.PI / 2.0))
   };
   public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(0.7, 0.7, 0.6);
   public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.3, 0.3, 0.3);

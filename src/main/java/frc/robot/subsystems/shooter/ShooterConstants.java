@@ -8,7 +8,7 @@ public final class ShooterConstants {
   public static final double READY_TOLERANCE_RPM = 400.0;
   public static final double MIN_READY_TARGET_RPM = 100.0;
   public static final double MAX_ACCELERATION_RPM_PER_SECOND = 12000.0;
-  public static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
+  public static final double STATOR_CURRENT_LIMIT_AMPS = 100.0;
   public static final double SUPPLY_CURRENT_LIMIT_AMPS = 80.0;
 
   // TODO: These gains are carried forward only to preserve behavior and require validation.

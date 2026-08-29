@@ -10,7 +10,7 @@ public final class ShotConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
   public static final int RED_TARGET_TAG_ID = 10;
   public static final int BLUE_TARGET_TAG_ID = 26;
-  public static final Transform2d TAG_TO_TARGET = new Transform2d(-0.62, 0.0, Rotation2d.kZero);
+  public static final Transform2d TAG_TO_TARGET = new Transform2d(-0.65, 0.0, Rotation2d.kZero); //was -0.62
   public static final Transform2d ROBOT_TO_SHOOTER_EXIT =
       new Transform2d(-0.1435885114, 0.0, Rotation2d.kZero);
   public static final double SHOT_LATENCY_SECONDS = 0.34;
