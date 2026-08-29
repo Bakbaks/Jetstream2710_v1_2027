@@ -31,6 +31,7 @@ public class IntakeIOReal implements IntakeIO {
     new TalonFX(ROLLER_LEFT_ID, Ports.RIO_CAN_BUS), new TalonFX(ROLLER_RIGHT_ID, Ports.RIO_CAN_BUS)
   };
   private final MotionMagicVoltage extensionRequest = new MotionMagicVoltage(0.0).withSlot(0);
+  private final VoltageOut extensionVoltageRequest = new VoltageOut(0.0);
   private final VoltageOut rollerRequest = new VoltageOut(0.0);
 
   public IntakeIOReal() {
@@ -92,6 +93,7 @@ public class IntakeIOReal implements IntakeIO {
     double pinionRotations = extensionMotor.getPosition().getValue().in(Rotations);
     inputs.extensionConnected = extensionMotor.isConnected();
     inputs.extensionPositionInches = pinionRotations * IntakeConstants.INCHES_PER_PINION_ROTATION;
+    inputs.extensionPositionRotations = pinionRotations;
     inputs.extensionVelocityRPM = extensionMotor.getVelocity().getValue().in(RPM);
     inputs.extensionAppliedVolts = extensionMotor.getMotorVoltage().getValue().in(Volts);
     inputs.extensionSupplyCurrentAmps = extensionMotor.getSupplyCurrent().getValue().in(Amps);
@@ -117,6 +119,11 @@ public class IntakeIOReal implements IntakeIO {
   public void setExtensionPositionRotations(double rotations){
     extensionMotor.setControl(
       extensionRequest.withPosition(Rotations.of(rotations)));
+  }
+
+  @Override
+  public void setExtensionVoltage(double volts) {
+    extensionMotor.setControl(extensionVoltageRequest.withOutput(Volts.of(volts)));
   }
 
   @Override

@@ -25,6 +25,7 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIOReal;
 import frc.robot.subsystems.hopper.HopperIOSim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIOReal;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.shooter.Shooter;
@@ -150,12 +151,12 @@ public class RobotContainer {
     auxController
         .rightTrigger()
         .whileTrue(
-            intake.goalCommand(Intake.Goal.COMPRESSION, Intake.Goal.STOP));
+            intake.auxiliaryOpenLoopCommand(-IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS));
 
     auxController 
         .leftTrigger()
         .whileTrue(
-            intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.STOP));
+            intake.auxiliaryOpenLoopCommand(IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS));
 
     auxController
         .leftBumper()

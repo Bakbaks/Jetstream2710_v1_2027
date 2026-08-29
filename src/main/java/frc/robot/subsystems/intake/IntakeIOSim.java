@@ -3,17 +3,24 @@ package frc.robot.subsystems.intake;
 public class IntakeIOSim implements IntakeIO {
   private double extensionPositionRotations;
   private double extensionTargetRotations;
+  private double extensionVolts;
+  private boolean extensionOpenLoop;
   private double rollerVolts;
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    extensionPositionRotations +=
-        (extensionTargetRotations - extensionPositionRotations) * 0.15;
+    if (extensionOpenLoop) {
+      extensionPositionRotations += extensionVolts / 12.0 * 0.08;
+    } else {
+      extensionPositionRotations +=
+          (extensionTargetRotations - extensionPositionRotations) * 0.15;
+    }
     inputs.extensionConnected = true;
     inputs.rollerConnected = new boolean[] {true, true};
     inputs.extensionPositionRotations = extensionPositionRotations;
     inputs.extensionPositionInches =
         extensionPositionRotations * IntakeConstants.INCHES_PER_PINION_ROTATION;
+    inputs.extensionAppliedVolts = extensionVolts;
     inputs.rollerAppliedVolts = new double[] {rollerVolts, rollerVolts};
     inputs.rollerVelocityRPM =
         new double[] {
@@ -24,12 +31,20 @@ public class IntakeIOSim implements IntakeIO {
 
   @Override
   public void setExtensionPositionInches(double positionInches) {
+    extensionOpenLoop = false;
     extensionTargetRotations = positionInches / IntakeConstants.INCHES_PER_PINION_ROTATION;
   }
 
   @Override
   public void setExtensionPositionRotations(double rotations) {
+    extensionOpenLoop = false;
     extensionTargetRotations = rotations;
+  }
+
+  @Override
+  public void setExtensionVoltage(double volts) {
+    extensionOpenLoop = true;
+    extensionVolts = volts;
   }
 
   @Override
