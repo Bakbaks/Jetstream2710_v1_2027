@@ -61,6 +61,7 @@ public class RobotContainer {
   private final CommandGamepad auxController = new CommandGamepad(AUX_PORT);
   private final SwerveRequest.SwerveDriveBrake brakeRequest =
       new SwerveRequest.SwerveDriveBrake();
+  private boolean feederEnabledForShot;
   private SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -83,19 +84,31 @@ public class RobotContainer {
             Commands.parallel(
                 Commands.startEnd(
                     () -> {
+                      feederEnabledForShot = false;
                       shooter.setShotRPM(ShooterConstants.DEFAULT_SHOT_RPM);
                       shooter.setGoal(Shooter.Goal.SHOOT);
                     },
-                    () -> shooter.setGoal(Shooter.Goal.STOP),
+                    () -> {
+                      feederEnabledForShot = false;
+                      shooter.setGoal(Shooter.Goal.STOP);
+                    },
                     shooter),
                 Commands.run(
-                        () ->
-                            hopper.setGoal(
-                                shooter.isReady()
+                        () -> {
+                          if (shooter.isReady()) {
+                            feederEnabledForShot = true;
+                          }
+                          hopper.setGoal(
+                                feederEnabledForShot
                                     ? Hopper.Goal.FEED
-                                    : Hopper.Goal.HOLD),
+                                    : Hopper.Goal.HOLD);
+                        },
                         hopper)
-                    .finallyDo(() -> hopper.setGoal(Hopper.Goal.STOP))));
+                    .finallyDo(
+                        () -> {
+                          feederEnabledForShot = false;
+                          hopper.setGoal(Hopper.Goal.STOP);
+                        })));
 
     driverController
         .leftTrigger()
@@ -151,12 +164,16 @@ public class RobotContainer {
     auxController
         .rightTrigger()
         .whileTrue(
-            intake.auxiliaryOpenLoopCommand(-IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS));
+            intake.auxiliaryOpenLoopCommand(
+                -IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
+                IntakeConstants.ROLLER_INTAKE_VOLTS));
 
     auxController 
         .leftTrigger()
         .whileTrue(
-            intake.auxiliaryOpenLoopCommand(IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS));
+            intake.auxiliaryOpenLoopCommand(
+                IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
+                IntakeConstants.AUXILIARY_OUTWARD_ROLLER_VOLTS));
 
     auxController
         .leftBumper()

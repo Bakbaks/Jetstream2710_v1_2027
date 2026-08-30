@@ -3,11 +3,14 @@ package frc.robot.subsystems.intake;
 public final class IntakeConstants {
   public static final double ROLLER_INTAKE_VOLTS = 8.0;
   public static final double ROLLER_EJECT_VOLTS = -8.0;
+  public static final double AUXILIARY_OUTWARD_ROLLER_VOLTS = -4.0;
   public static final double EXTENSION_OPEN_LOOP_VOLTS = 8.0;
   public static final double RETRACTED_INCHES = 0.0;
   public static final double EXTENDED_INCHES = 6.0;
-  public static final double EXTENDED_ROTATIONS = 3.0;
+  public static final double EXTENDED_ROTATIONS = 3.25;
   public static final double RETRACTED_ROTATIONS = -0.25;
+  public static final double INTAKE_ROLLER_DIRECTION_CHANGE_ROTATIONS =
+      (RETRACTED_ROTATIONS + EXTENDED_ROTATIONS) / 2.0;
 
   public static final double POSITION_TOLERANCE_INCHES = 0.25;
   public static final double POSITION_TOLERANCE_ROTATIONS = 0.25;

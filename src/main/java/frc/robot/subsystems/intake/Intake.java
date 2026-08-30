@@ -23,6 +23,7 @@ public class Intake extends SubsystemBase {
   private boolean auxiliaryExtensionActive;
   private double auxiliaryExtensionVolts;
   private boolean auxiliaryRollersActive;
+  private double auxiliaryRollerVolts;
 
   public Intake(IntakeIO io) {
     this.io = io;
@@ -56,7 +57,13 @@ public class Intake extends SubsystemBase {
         }
       }
     }
-    if (auxiliaryRollersActive || goal == Goal.INTAKE || goal == Goal.COMPRESSION) {
+    if (auxiliaryRollersActive) {
+      io.setRollerVoltage(auxiliaryRollerVolts);
+    } else if (goal == Goal.INTAKE
+        && inputs.extensionPositionRotations
+            < IntakeConstants.INTAKE_ROLLER_DIRECTION_CHANGE_ROTATIONS) {
+      io.setRollerVoltage(IntakeConstants.ROLLER_EJECT_VOLTS);
+    } else if (goal == Goal.INTAKE || goal == Goal.COMPRESSION) {
       io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
     } else if (goal == Goal.EJECT) {
       io.setRollerVoltage(IntakeConstants.ROLLER_EJECT_VOLTS);
@@ -92,13 +99,14 @@ public class Intake extends SubsystemBase {
     return runOnce(() -> setGoal(requestedGoal));
   }
 
-  public Command auxiliaryOpenLoopCommand(double extensionVolts) {
+  public Command auxiliaryOpenLoopCommand(double extensionVolts, double rollerVolts) {
     return Commands.startEnd(
         () -> {
           auxiliaryExtensionOverride = true;
           auxiliaryExtensionActive = true;
           auxiliaryExtensionVolts = extensionVolts;
           auxiliaryRollersActive = true;
+          auxiliaryRollerVolts = rollerVolts;
         },
         () -> {
           auxiliaryExtensionOverride = true;
