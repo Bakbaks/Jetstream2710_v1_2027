@@ -85,7 +85,8 @@ public class RobotContainer {
                 Commands.startEnd(
                     () -> {
                       feederEnabledForShot = false;
-                      shooter.setShotRPM(ShooterConstants.DEFAULT_SHOT_RPM);
+                      var shotSolution = shotCalculator.calculate(getAllianceTarget());
+                      shooter.setShotRPM(shotSolution.shooterRPM());
                       shooter.setGoal(Shooter.Goal.SHOOT);
                     },
                     () -> {
@@ -134,7 +135,7 @@ public class RobotContainer {
                 .until(this::hasDriverRotationOverride));
 
     driverController
-        .leftBumper()
+        .leftBumper()  
         .toggleOnTrue(
             Commands.parallel(
                 Commands.startEnd(
