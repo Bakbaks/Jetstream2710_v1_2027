@@ -17,6 +17,7 @@ public interface HopperIO {
   default void updateInputs(HopperIOInputs inputs) {}
 
   default void setVelocityRPM(double floorRPM, double feederRPM) {}
+  default void setFeederVoltage(double volts) {}
 
   default void stop() {
     setVelocityRPM(0.0, 0.0);

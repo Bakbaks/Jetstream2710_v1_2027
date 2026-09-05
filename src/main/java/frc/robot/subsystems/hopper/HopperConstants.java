@@ -3,13 +3,13 @@ package frc.robot.subsystems.hopper;
 public final class HopperConstants {
   public static final double FEED_FLOOR_RPM = 5000.0; //* 0.789;
   public static final double HOLD_FLOOR_RPM = 200.0;
-  public static final double FEED_FEEDER_RPM = 5000.0;
+  public static final double FEED_FEEDER_RPM = 4500.0;
   public static final double REVERSE_RPM = -900.0;
   public static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
   public static final double SUPPLY_CURRENT_LIMIT_AMPS = 60.0;
 
   // TODO: Unvalidated values retained from the existing robot.
-  public static final double VELOCITY_KP = 0.001; // 0.05
+  public static final double VELOCITY_KP = 0.1; // 0.05
   public static final double VELOCITY_KI = 0.0;
   public static final double VELOCITY_KD = 0.0;
   public static final double FREE_SPEED_RPM = 6000.0;

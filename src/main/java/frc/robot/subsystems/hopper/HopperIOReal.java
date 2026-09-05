@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -33,7 +34,7 @@ public class HopperIOReal implements HopperIO {
     new TalonFX(FEEDER_RIGHT_ID, Ports.RIO_CAN_BUS)
   };
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0).withSlot(0);
-
+  private final VoltageOut feederRequest = new VoltageOut(0.0);
   public HopperIOReal() {
     InvertedValue[] inversions = {
       InvertedValue.Clockwise_Positive,
@@ -87,5 +88,12 @@ public class HopperIOReal implements HopperIO {
     motors[FLOOR_RIGHT].setControl(velocityRequest.withVelocity(RPM.of(floorRPM)));
     motors[FEEDER_LEFT].setControl(velocityRequest.withVelocity(RPM.of(feederRPM)));
     motors[FEEDER_RIGHT].setControl(velocityRequest.withVelocity(RPM.of(feederRPM)));
+  }
+
+  @Override
+  public void setFeederVoltage(double volts) {
+    for (TalonFX motor : motors) {
+      motor.setControl(feederRequest.withOutput(Volts.of(volts)));
+    }
   }
 }
