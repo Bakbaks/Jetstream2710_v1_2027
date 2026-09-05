@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
     } else if (goal == Goal.INTAKE
         && inputs.extensionPositionRotations
             < IntakeConstants.INTAKE_ROLLER_DIRECTION_CHANGE_ROTATIONS) {
-      io.setRollerVoltage(IntakeConstants.ROLLER_EJECT_VOLTS);
+      io.setRollerVoltage(0.0);
     } else if (goal == Goal.INTAKE || goal == Goal.COMPRESSION) {
       io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
     } else if (goal == Goal.EJECT) {
