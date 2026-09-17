@@ -26,7 +26,7 @@ public class ShooterIOReal implements ShooterIO {
 
   public ShooterIOReal() {
     for (int i = 0; i < motors.length; i++) {
-      motors[i] = new TalonFX(MOTOR_IDS[i], Ports.RIO_CAN_BUS);
+      motors[i] = new TalonFX(MOTOR_IDS[i], Ports.FLYWHEEL_CAN_BUS);
       configureMotor(
           motors[i],
           i < 2 ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive);

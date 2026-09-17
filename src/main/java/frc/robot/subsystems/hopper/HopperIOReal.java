@@ -28,10 +28,10 @@ public class HopperIOReal implements HopperIO {
   private static final int FEEDER_RIGHT_ID = 20; // needs to be 51
 
   private final TalonFX[] motors = {
-    new TalonFX(FLOOR_LEFT_ID, Ports.RIO_CAN_BUS),
-    new TalonFX(FEEDER_LEFT_ID, Ports.RIO_CAN_BUS),
-    new TalonFX(FLOOR_RIGHT_ID, Ports.RIO_CAN_BUS),
-    new TalonFX(FEEDER_RIGHT_ID, Ports.RIO_CAN_BUS)
+    new TalonFX(FLOOR_LEFT_ID, Ports.FLOOREXTENDO_CAN_BUS),
+    new TalonFX(FEEDER_LEFT_ID, Ports.FEEDER_CAN_BUS),
+    new TalonFX(FLOOR_RIGHT_ID, Ports.FLOOREXTENDO_CAN_BUS),
+    new TalonFX(FEEDER_RIGHT_ID, Ports.FEEDER_CAN_BUS)
   };
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0).withSlot(0);
   private final VoltageOut feederRequest = new VoltageOut(0.0);
