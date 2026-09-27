@@ -17,13 +17,15 @@ public final class VisionConstants {
   public static final String[] CAMERA_NAMES = {"Cam3", "Cam1", "Cam2"};
   public static final Transform3d[] ROBOT_TO_CAMERAS = {
     new Transform3d(
-        new Translation3d(-0.0141, 0.383, 0.484),
+        //new Translation3d(-0.0141, 0.383, 0.484),
+        new Translation3d(-0.0156, 0.3835, 0.4879),
         new Rotation3d(Units.degreesToRadians(45), 0.0, Math.PI / 2.0)),
     new Transform3d(
         new Translation3d(-0.2441, 0.0, 0.163),
         new Rotation3d(Math.PI, Units.degreesToRadians(30), Math.PI)),
     new Transform3d(
-        new Translation3d(-0.0141, -0.383, 0.484),
+        //new Translation3d(-0.0141, -0.383, 0.484),
+        new Translation3d(-0.0156, -0.3835, 0.4879),
         new Rotation3d(Units.degreesToRadians(-45), 0.0, -Math.PI / 2.0))
   };
   public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(0.7, 0.7, 0.6);
