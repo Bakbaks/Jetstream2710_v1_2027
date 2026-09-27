@@ -216,7 +216,7 @@ public class RobotContainer {
 
   private void configureAutos() {
     NamedCommands.registerCommand(
-        "Test",
+        "Volley",
         Commands.run(
                 () -> {
                   var shotSolution = shotCalculator.calculate(getAllianceTarget());
@@ -224,10 +224,12 @@ public class RobotContainer {
                   shooter.setGoal(Shooter.Goal.SHOOT);
                   hopper.setGoal(
                       shotVerifier.canFire(shotSolution) ? Hopper.Goal.FEED : Hopper.Goal.HOLD);
+                  intake.setGoal(Intake.Goal.COMPRESSION);
                 },
                 shooter,
-                hopper)
-            .withTimeout(2.0));
+                hopper,
+                intake)
+            .withTimeout(2.3));
 
     autoChooser = AutoBuilder.buildAutoChooser("Taxi");
     SmartDashboard.putData("Auto Chooser", autoChooser);
