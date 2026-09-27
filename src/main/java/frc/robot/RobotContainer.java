@@ -231,6 +231,14 @@ public class RobotContainer {
                 intake)
             .withTimeout(2.3));
 
+    NamedCommands.registerCommand(
+        "Start_Intake",
+        intake.setGoalCommand(Intake.Goal.INTAKE));
+
+    NamedCommands.registerCommand(
+        "Stop_Intake",
+        intake.setGoalCommand(Intake.Goal.DEPLOY));
+
     autoChooser = AutoBuilder.buildAutoChooser("Taxi");
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
