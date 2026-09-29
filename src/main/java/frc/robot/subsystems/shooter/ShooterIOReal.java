@@ -19,7 +19,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Ports;
 
 public class ShooterIOReal implements ShooterIO {
-  private static final int[] MOTOR_IDS = {16, 14, 17, 15};
+  private static final int[] MOTOR_IDS = {17, 15, 14, 16};
   private final TalonFX[] motors = new TalonFX[4];
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0).withSlot(0);
   private final VoltageOut voltageRequest = new VoltageOut(0.0);

@@ -38,33 +38,33 @@ public class Intake extends SubsystemBase {
     } else {
       switch (goal) {
         case STOW -> {
-          io.setExtensionPositionRotations(IntakeConstants.RETRACTED_ROTATIONS);
+          io.setExtensionVoltage(auxiliaryExtensionVolts);
+          //io.setExtensionPositionRotations(holdPositionRotations);
         }
         case DEPLOY -> {
-          io.setExtensionPositionRotations(IntakeConstants.EXTENDED_ROTATIONS);
+          io.setExtensionVoltage(auxiliaryExtensionVolts);
+          //io.setExtensionPositionRotations(holdPositionRotations);
         }
         case INTAKE -> {
-          io.setExtensionPositionRotations(IntakeConstants.EXTENDED_ROTATIONS);
+          io.setExtensionVoltage(auxiliaryExtensionVolts);
+          //io.setExtensionPositionRotations(holdPositionRotations);
         }
         case EJECT -> {
-          io.setExtensionPositionRotations(IntakeConstants.EXTENDED_ROTATIONS);
+          io.setExtensionVoltage(auxiliaryExtensionVolts);
+          //io.setExtensionPositionRotations(holdPositionRotations);
         }
         case COMPRESSION -> {
-          io.setExtensionPositionRotations(IntakeConstants.RETRACTED_ROTATIONS);
+          io.setExtensionVoltage(auxiliaryExtensionVolts);
+          //io.setExtensionPositionRotations(holdPositionRotations);
         }
         case STOP -> {
-          io.setExtensionPositionRotations(holdPositionRotations);
+          io.setExtensionVoltage(auxiliaryExtensionVolts);
+          //io.setExtensionPositionRotations(holdPositionRotations);
         }
       }
     }
     if (auxiliaryRollersActive) {
       io.setRollerVoltage(auxiliaryRollerVolts);
-    } else if (goal == Goal.INTAKE
-        && inputs.extensionPositionRotations
-            < IntakeConstants.INTAKE_ROLLER_DIRECTION_CHANGE_ROTATIONS || goal == Goal.COMPRESSION
-        && inputs.extensionPositionRotations
-            < IntakeConstants.INTAKE_ROLLER_DIRECTION_CHANGE_ROTATIONS) {
-      io.setRollerVoltage(0.0);
     } else if (goal == Goal.INTAKE || goal == Goal.COMPRESSION) {
       io.setRollerVoltage(IntakeConstants.ROLLER_INTAKE_VOLTS);
     } else if (goal == Goal.EJECT) {

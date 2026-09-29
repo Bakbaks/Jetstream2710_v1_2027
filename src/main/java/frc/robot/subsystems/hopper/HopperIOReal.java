@@ -42,12 +42,15 @@ public class HopperIOReal implements HopperIO {
       InvertedValue.CounterClockwise_Positive,
       InvertedValue.Clockwise_Positive
     };
-    for (int i = 0; i < motors.length; i++) {
-      configureMotor(motors[i], inversions[i]);
+    for (int i = 0; i < motors.length; i+=2) {
+      configureFloorMotor(motors[i], inversions[i]);
+    }
+    for (int i = 1; i < motors.length; i+=2) {
+      configureFeederMotor(motors[i], inversions[i]);
     }
   }
 
-  private static void configureMotor(TalonFX motor, InvertedValue inversion) {
+  private static void configureFeederMotor(TalonFX motor, InvertedValue inversion) {
     var config =
         new TalonFXConfiguration()
             .withMotorOutput(
@@ -59,6 +62,28 @@ public class HopperIOReal implements HopperIO {
                     .withStatorCurrentLimit(Amps.of(HopperConstants.STATOR_CURRENT_LIMIT_AMPS))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(Amps.of(HopperConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                    .withSupplyCurrentLimitEnable(true))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(HopperConstants.VELOCITY_KP)
+                    .withKI(HopperConstants.VELOCITY_KI)
+                    .withKD(HopperConstants.VELOCITY_KD)
+                    .withKV(12.0 / RPM.of(HopperConstants.FREE_SPEED_RPM).in(RotationsPerSecond)));
+    motor.getConfigurator().apply(config);
+  }
+
+  private static void configureFloorMotor(TalonFX motor, InvertedValue inversion) {
+    var config =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(inversion)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(HopperConstants.FLOOR_STATOR_CURRENT_LIMIT_AMPS))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(HopperConstants.FLOOR_SUPPLY_CURRENT_LIMIT_AMPS))
                     .withSupplyCurrentLimitEnable(true))
             .withSlot0(
                 new Slot0Configs()
