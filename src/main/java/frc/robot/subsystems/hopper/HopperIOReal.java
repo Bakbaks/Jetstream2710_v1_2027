@@ -33,6 +33,7 @@ public class HopperIOReal implements HopperIO {
     new TalonFX(FLOOR_RIGHT_ID, Ports.FLOOREXTENDO_CAN_BUS),
     new TalonFX(FEEDER_RIGHT_ID, Ports.FEEDER_CAN_BUS)
   };
+  
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0).withSlot(0);
   private final VoltageOut feederRequest = new VoltageOut(0.0);
   public HopperIOReal() {
@@ -117,8 +118,15 @@ public class HopperIOReal implements HopperIO {
 
   @Override
   public void setFeederVoltage(double volts) {
-    for (TalonFX motor : motors) {
-      motor.setControl(feederRequest.withOutput(Volts.of(volts)));
-    }
+    motors[1].setControl(feederRequest.withOutput(Volts.of(volts)));
+    motors[3].setControl(feederRequest.withOutput(Volts.of(volts)));
+    
   }
+
+  @Override
+  public void setFloorVoltage(double volts){
+    motors[0].setControl(feederRequest.withOutput(Volts.of(volts)));
+    motors[2].setControl(feederRequest.withOutput(Volts.of(volts)));
+  }
+  
 }
