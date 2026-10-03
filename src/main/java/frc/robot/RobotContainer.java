@@ -24,10 +24,12 @@ import frc.robot.subsystems.drivetrain.TunerConstants;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIOReal;
 import frc.robot.subsystems.hopper.HopperIOSim;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeIOReal;
-import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intakeextension.IntakeExtension;
+import frc.robot.subsystems.intakeextension.IntakeExtensionIOReal;
+import frc.robot.subsystems.intakeextension.IntakeExtensionIOSim;
+import frc.robot.subsystems.intakerollers.IntakeRollers;
+import frc.robot.subsystems.intakerollers.IntakeRollersIOReal;
+import frc.robot.subsystems.intakerollers.IntakeRollersIOSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIOReal;
@@ -49,8 +51,12 @@ public class RobotContainer {
       new Shooter(RobotBase.isReal() ? new ShooterIOReal() : new ShooterIOSim());
   private final Hopper hopper =
       new Hopper(RobotBase.isReal() ? new HopperIOReal() : new HopperIOSim());
-  private final Intake intake =
-      new Intake(RobotBase.isReal() ? new IntakeIOReal() : new IntakeIOSim());
+  private final IntakeExtension intakeExtension =
+      new IntakeExtension(
+          RobotBase.isReal() ? new IntakeExtensionIOReal() : new IntakeExtensionIOSim());
+  private final IntakeRollers intakeRollers =
+      new IntakeRollers(
+          RobotBase.isReal() ? new IntakeRollersIOReal() : new IntakeRollersIOSim());
   private final Vision vision =
       new Vision(
           RobotBase.isReal() ? new VisionIOReal() : new VisionIOSim(),
@@ -113,7 +119,8 @@ public class RobotContainer {
 
     driverController
         .leftTrigger()
-        .whileTrue(intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY));
+        .whileTrue(
+            intakeRollers.goalCommand(IntakeRollers.Goal.INTAKE, IntakeRollers.Goal.STOP));
 
     driverController
         .rightBumper()
@@ -165,24 +172,25 @@ public class RobotContainer {
     auxController
         .rightTrigger()
         .whileTrue(
-            intake.auxiliaryOpenLoopCommand(
-                -IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
-                IntakeConstants.ROLLER_INTAKE_VOLTS));
+            intakeExtension.goalCommand(
+                IntakeExtension.Goal.RETRACT, IntakeExtension.Goal.STOP));
 
-    auxController 
+    auxController
+        .rightTrigger()
+        .whileTrue(
+            intakeRollers.goalCommand(IntakeRollers.Goal.INTAKE, IntakeRollers.Goal.STOP));
+
+    auxController
         .leftTrigger()
         .whileTrue(
-            intake.auxiliaryOpenLoopCommand(
-                IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
-                IntakeConstants.AUXILIARY_OUTWARD_ROLLER_VOLTS));
+            intakeExtension.goalCommand(IntakeExtension.Goal.EXTEND, IntakeExtension.Goal.STOP));
 
     auxController
         .leftBumper()
         .whileTrue(
             Commands.parallel(
-                intake.goalCommand(Intake.Goal.EJECT, Intake.Goal.STOP),
-                hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)
-            ));
+                intakeRollers.goalCommand(IntakeRollers.Goal.EJECT, IntakeRollers.Goal.STOP),
+                hopper.goalCommand(Hopper.Goal.REVERSE, Hopper.Goal.STOP)));
 
 
     auxController
@@ -209,15 +217,13 @@ public class RobotContainer {
   private void configureAutos() {
     NamedCommands.registerCommand(
         "ExtendIntake",
-        intake
-            .auxiliaryOpenLoopCommand(
-                IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
-                IntakeConstants.AUXILIARY_OUTWARD_ROLLER_VOLTS)
+        intakeExtension
+            .goalCommand(IntakeExtension.Goal.EXTEND, IntakeExtension.Goal.STOP)
             .withTimeout(1.5));
 
     NamedCommands.registerCommand(
         "RunIntake",
-        intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY));
+        intakeRollers.goalCommand(IntakeRollers.Goal.INTAKE, IntakeRollers.Goal.STOP));
 
     NamedCommands.registerCommand(
         "PrepShooter",
@@ -263,15 +269,14 @@ public class RobotContainer {
                 },
                 shooter,
                 hopper),
-            intake.auxiliaryOpenLoopCommand(
-                -IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
-                IntakeConstants.ROLLER_INTAKE_VOLTS))
+            intakeExtension.goalCommand(
+                IntakeExtension.Goal.RETRACT, IntakeExtension.Goal.STOP),
+            intakeRollers.goalCommand(IntakeRollers.Goal.INTAKE, IntakeRollers.Goal.STOP))
         .withTimeout(3)
         .finallyDo(
             () -> {
               shooter.setGoal(Shooter.Goal.STOP);
               hopper.setGoal(Hopper.Goal.STOP);
-              intake.setGoal(Intake.Goal.DEPLOY);
             });
   }
 
