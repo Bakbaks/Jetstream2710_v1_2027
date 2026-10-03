@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 6.681065200328297,
-        "y": 0.47711857076513525
+        "y": 0.4771185707651353
       },
       "nextControl": {
         "x": 8.128619345228584,
@@ -177,25 +177,45 @@
       "name": "ExtendIntake",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ExtendIntake"
+        }
+      }
     },
     {
       "name": "RunIntake",
       "waypointRelativePos": 0.6004962779156596,
       "endWaypointRelativePos": 2.9528535980148796,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "RunIntake"
+        }
+      }
     },
     {
       "name": "PrepShooter",
       "waypointRelativePos": 2.833746898263028,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "PrepShooter"
+        }
+      }
     },
     {
       "name": "ShootVolley",
       "waypointRelativePos": 4.0,
       "endWaypointRelativePos": 5.0,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ShootVolley"
+        }
+      }
     }
   ],
   "globalConstraints": {

@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 3.6353222222222223,
-        "y": 0.6244444444444435
+        "y": 0.6244444444444436
       },
       "nextControl": {
         "x": 5.635322222222222,
@@ -61,7 +61,19 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "ExtendIntake",
+      "waypointRelativePos": 1.490884537474668,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ExtendIntake"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 2.0,

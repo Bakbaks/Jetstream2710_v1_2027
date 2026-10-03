@@ -257,7 +257,7 @@ public class RobotContainer {
             intake.auxiliaryOpenLoopCommand(
                 -IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
                 IntakeConstants.ROLLER_INTAKE_VOLTS))
-        .withTimeout(2.3)
+        .withTimeout(3)
         .finallyDo(
             () -> {
               shooter.setGoal(Shooter.Goal.STOP);

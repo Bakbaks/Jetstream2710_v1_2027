@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ShootVolley"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "RightDoubleSweep3"
