@@ -196,15 +196,7 @@ public class RobotContainer {
 
     auxController
         .southFace()
-        .toggleOnTrue(
-            Commands.run(
-                    () -> {
-                      var shotSolution = shotCalculator.calculate(getAllianceTarget());
-                      shooter.setShotRPM(shotSolution.shooterRPM());
-                      shooter.setGoal(Shooter.Goal.PREP);
-                    },
-                    shooter)
-                .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP)));
+        .toggleOnTrue(createPrepShooterCommand());
 
     
     
@@ -216,31 +208,62 @@ public class RobotContainer {
 
   private void configureAutos() {
     NamedCommands.registerCommand(
-        "Volley",
-        Commands.run(
+        "ExtendIntake",
+        intake
+            .auxiliaryOpenLoopCommand(
+                IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
+                IntakeConstants.AUXILIARY_OUTWARD_ROLLER_VOLTS)
+            .withTimeout(1.5));
+
+    NamedCommands.registerCommand(
+        "RunIntake",
+        intake.goalCommand(Intake.Goal.INTAKE, Intake.Goal.DEPLOY));
+
+    NamedCommands.registerCommand(
+        "PrepShooter",
+        createPrepShooterCommand());
+
+    NamedCommands.registerCommand(
+        "ShootVolley",
+        createShootVolleyCommand());
+
+    autoChooser = AutoBuilder.buildAutoChooser("Taxi");
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+  }
+
+  private Command createPrepShooterCommand() {
+    return Commands.run(
+            () -> {
+              var shotSolution = shotCalculator.calculate(getAllianceTarget());
+              shooter.setShotRPM(shotSolution.shooterRPM());
+              shooter.setGoal(Shooter.Goal.PREP);
+            },
+            shooter)
+        .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP));
+  }
+
+  private Command createShootVolleyCommand() {
+    return Commands.parallel(
+            Commands.run(
                 () -> {
                   var shotSolution = shotCalculator.calculate(getAllianceTarget());
                   shooter.setShotRPM(shotSolution.shooterRPM());
                   shooter.setGoal(Shooter.Goal.SHOOT);
                   hopper.setGoal(
                       shotVerifier.canFire(shotSolution) ? Hopper.Goal.FEED : Hopper.Goal.HOLD);
-                  intake.setGoal(Intake.Goal.COMPRESSION);
                 },
                 shooter,
-                hopper,
-                intake)
-            .withTimeout(2.3));
-
-    NamedCommands.registerCommand(
-        "Start_Intake",
-        intake.setGoalCommand(Intake.Goal.INTAKE));
-
-    NamedCommands.registerCommand(
-        "Stop_Intake",
-        intake.setGoalCommand(Intake.Goal.DEPLOY));
-
-    autoChooser = AutoBuilder.buildAutoChooser("Taxi");
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+                hopper),
+            intake.auxiliaryOpenLoopCommand(
+                -IntakeConstants.EXTENSION_OPEN_LOOP_VOLTS,
+                IntakeConstants.ROLLER_INTAKE_VOLTS))
+        .withTimeout(2.3)
+        .finallyDo(
+            () -> {
+              shooter.setGoal(Shooter.Goal.STOP);
+              hopper.setGoal(Hopper.Goal.STOP);
+              intake.setGoal(Intake.Goal.DEPLOY);
+            });
   }
 
   private Optional<Translation2d> getAllianceTarget() {
