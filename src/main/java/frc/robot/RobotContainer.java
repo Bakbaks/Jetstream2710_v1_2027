@@ -152,15 +152,15 @@ public class RobotContainer {
                     () -> PASS_HEADING))
                 .until(this::hasDriverRotationOverride));
 
-    driverController
-        .southFace()
-        .whileTrue(
-            DriveCommands.highwayAssist(
-                drivetrain,
-                robotState::getPose,
-                driverController::getLeftX,
-                driverController::getLeftY,
-                driverController::getRightX));
+    // driverController
+    //     .southFace()
+    //     .whileTrue(
+    //         DriveCommands.highwayAssist(
+    //             drivetrain,
+    //             robotState::getPose,
+    //             driverController::getLeftX,
+    //             driverController::getLeftY,
+    //             driverController::getRightX));
 
     auxController
         .rightTrigger()
