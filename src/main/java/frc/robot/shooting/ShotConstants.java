@@ -16,7 +16,7 @@ public final class ShotConstants {
   public static final double SHOT_LATENCY_SECONDS = 0.34;
   public static final int PREDICTION_ITERATIONS = 2;
   public static final double HEADING_TOLERANCE_RADIANS = Math.toRadians(1.0);
-  public static final double MAX_SHOOTING_SPEED_METERS_PER_SECOND = 1.0;
+  public static final double MAX_SHOOTING_SPEED_METERS_PER_SECOND = 3.0;
   public static final double DEFAULT_TIME_OF_FLIGHT_SECONDS = 0.28;
 
   private ShotConstants() {}

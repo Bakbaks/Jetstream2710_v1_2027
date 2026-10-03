@@ -119,14 +119,14 @@ public class RobotContainer {
         .rightBumper()
         .toggleOnTrue(
             Commands.parallel(
-                Commands.run(
-                        () -> {
-                          var shotSolution = shotCalculator.calculate(getAllianceTarget());
-                          shooter.setShotRPM(shotSolution.shooterRPM());
-                          shooter.setGoal(Shooter.Goal.AIM);
-                        },
-                        shooter)
-                    .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP)),
+                // Commands.run(
+                //         () -> {
+                //           var shotSolution = shotCalculator.calculate(getAllianceTarget());
+                //           shooter.setShotRPM(shotSolution.shooterRPM());
+                //           shooter.setGoal(Shooter.Goal.AIM);
+                //         },
+                //         shooter)
+                //     .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP)),
                 DriveCommands.joystickDriveAtHeading(
                     drivetrain,
                     driverController::getLeftY,
@@ -232,14 +232,23 @@ public class RobotContainer {
   }
 
   private Command createPrepShooterCommand() {
-    return Commands.run(
-            () -> {
-              var shotSolution = shotCalculator.calculate(getAllianceTarget());
-              shooter.setShotRPM(shotSolution.shooterRPM());
-              shooter.setGoal(Shooter.Goal.PREP);
-            },
-            shooter)
-        .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP));
+    // return Commands.run(
+    //         () -> {
+    //           var shotSolution = shotCalculator.calculate(getAllianceTarget());
+    //           shooter.setShotRPM(shotSolution.shooterRPM());
+    //           shooter.setGoal(Shooter.Goal.PREP);
+    //         },
+    //         shooter)
+    //     .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP));
+
+        return Commands.run(
+                        () -> {
+                          var shotSolution = shotCalculator.calculate(getAllianceTarget());
+                          shooter.setShotRPM(shotSolution.shooterRPM());
+                          shooter.setGoal(Shooter.Goal.AIM);
+                        },
+                        shooter)
+                    .finallyDo(() -> shooter.setGoal(Shooter.Goal.STOP));
   }
 
   private Command createShootVolleyCommand() {
@@ -250,7 +259,7 @@ public class RobotContainer {
                   shooter.setShotRPM(shotSolution.shooterRPM());
                   shooter.setGoal(Shooter.Goal.SHOOT);
                   hopper.setGoal(
-                      shotVerifier.canFire(shotSolution) ? Hopper.Goal.FEED : Hopper.Goal.HOLD);
+                      shooter.isReady() ? Hopper.Goal.FEED : Hopper.Goal.HOLD);
                 },
                 shooter,
                 hopper),

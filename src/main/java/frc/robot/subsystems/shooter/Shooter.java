@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
         setpointRPM = inputs.averageVelocityRPM;
       }
       case IDLE -> runVelocity(ShooterConstants.IDLE_RPM);
-      case PREP -> runVelocity(requestedShotRPM * 0.6);
+      case PREP -> runVelocity(requestedShotRPM * 0.9);
       case AIM -> runVelocity(requestedShotRPM);
       case SHOOT -> runVelocity(requestedShotRPM);
       case REVERSE -> runVelocity(ShooterConstants.REVERSE_RPM);

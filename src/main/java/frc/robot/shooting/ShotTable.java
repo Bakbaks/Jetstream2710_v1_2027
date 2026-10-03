@@ -10,9 +10,9 @@ public final class ShotTable {
 
   public ShotTable() {
     rpmTable.put(1.7, 1750.0);
-    rpmTable.put(2.5, 1800.0);
-    rpmTable.put(3.0, 1850.0);
-    rpmTable.put(5.0, 1900.0);
+    rpmTable.put(2.5, 1780.0);
+    rpmTable.put(3.0, 1800.0);
+    rpmTable.put(6.0, 1900.0);
     timeOfFlightTable.put(1.7, 0.75);
     timeOfFlightTable.put(3.0, 0.905);
     timeOfFlightTable.put(3.6, 1.085);
